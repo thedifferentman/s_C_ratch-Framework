@@ -1,0 +1,123 @@
+program ::= { declaration }
+
+declaration ::= struct_definition ";"
+| struct_declaration ";"
+| array_definition ";"
+| function_definition
+| function_declaration ";"
+| variable_definition ";"
+
+variable_definition ::= type_specifier direct_variable_declaration { "," direct_variable_declaration }
+
+array_definition ::= type_specifier direct_array_declaration { "," direct_array_declaration }
+
+function_declaration ::= type_specifier direct_function_declaration { "," direct_function_declaration }
+
+function_definition ::= type_specifier direct_function_declaration scope
+
+type_specifier ::= { "const" } type_keyword { "const" } | { "const" } "struct" IDENTIFIER { "const" }
+
+full_type_specifier ::= type_specifier { pointer_specifier }
+
+direct_variable_declaration ::= { pointer_specifier } IDENTIFIER [ "=" initial_element ]
+
+direct_array_declaration ::= { pointer_specifier } IDENTIFIER "[" expression "]" { "[" expression "]" } [ [ "=" ] initial_list ]
+| { pointer_specifier } IDENTIFIER "[" "]" [ "=" ] initial_list
+
+direct_function_declaration ::= { pointer_specifier } IDENTIFIER "(" [ argument_list ] ")"
+
+scope ::= "{" statement_list "}"
+
+type_keyword ::= "void" | "var"
+
+pointer_specifier ::= "*" { "const" }
+
+expression ::= assignment_expression { "," assignment_expression }
+
+assignment_expression ::= { unary_expression assignment_operator } conditional_expression
+
+assignment_operator ::= "=" | "*=" | "/=" | "%=" | "+=" | "-="
+
+conditional_expression ::= { logical_or_expression "?" expression ":" } logical_or_expression
+
+logical_or_expression ::= logical_and_expression { "||" logical_and_expression }
+
+logical_and_expression ::= equality_expression { "&&" equality_expression }
+
+equality_expression ::= relational_expression { equality_operator relational_expression }
+
+equality_operator ::= "==" | "!="
+
+relational_expression ::= additive_expression { relational_operator additive_expression }
+
+relational_operator ::= "<" | ">" | "<=" | ">="
+
+additive_expression ::= multiplicative_expression { additive_operator multiplicative_expression }
+
+additive_operator ::= "+" | "-"
+
+multiplicative_expression ::= power_expression { multiplicative_operator power_expression }
+
+multiplicative_operator ::= "*" | "/" | "%"
+
+power_expression ::= unary_expression { "^" unary_expression }
+
+unary_expression ::= { unary_operation } postfix_expression
+| "sizeof" "(" full_type_specifier ")"
+
+unary_operation ::= "&" | "*" | "+" | "-" | "!" | "++" | "--" | "sizeof" | "(" full_type_specifier ")"
+
+postfix_expression ::= primary_expression { postfix_operation }
+
+postfix_operation ::= "[" expression "]" | "." IDENTIFIER | "->" IDENTIFIER | "++" |  "--"
+
+primary_expression ::= IDENTIFIER [ "(" [ assignment_expression { "," assignment_expression } ] ")" ]
+| CONSTANT
+| "(" expression ")"
+
+initial_list ::= "{" initial_element { "," initial_element } [ "," ] "}"
+| "{" struct_member "=" initial_element { "," struct_member "=" initial_element } [ "," ] "}"
+
+struct_member ::= { "." IDENTIFIER }
+
+initial_element ::= initial_list | assignment_expression
+
+argument_list ::= argument_declaration { "," argument_declaration }
+
+argument_declaration ::= full_type_specifier IDENTIFIER
+
+struct_declaration ::= "struct" IDENTIFIER
+
+struct_definition ::= struct_declaration "{" { struct_member_declaration ";" } "}"
+
+struct_member_declaration ::= type_specifier struct_member_declarator { "," struct_member_declarator }
+| struct_definition
+
+struct_member_declarator ::= { pointer_specifier } IDENTIFIER "[" expression "]" { "[" expression "]" }
+| { pointer_specifier } IDENTIFIER
+
+statement_list ::= { statement }
+
+statement ::= ";"
+| scope
+| array_definition ";"
+| variable_definition ";"
+| expression ";"
+| selection_statement
+| switch_structure
+| iteration_statement
+| jump_statement
+
+selection_statement ::= "if" "(" expression ")" statement [ "else" statement ]
+
+switch_structure ::= "switch" "(" expression ")" "{" { switch_statement } "}"
+
+switch_statement ::= "case" expression ":" | "default" ":" | statement
+
+iteration_statement ::= "while" "(" expression ")" statement
+| "do" statement "while" "(" expression ")"
+| "for" "(" [ expression ] ";" [ expression ] ";" [ expression ] ")" statement
+| "for" "(" [ array_definition ] ";" [ expression ] ";" [ expression ] ")" statement
+| "for" "(" [ variable_definition ] ";" [ expression ] ";" [ expression ] ")" statement
+
+jump_statement ::= "continue" ";" | "break" ";" | "return" [ expression ] ";"
